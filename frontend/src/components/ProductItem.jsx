@@ -15,6 +15,7 @@ const ProductItem = ({ id, image, name, price }) => {
             </div>
         </Link>
     )
+    
 }
 
 export default ProductItem
