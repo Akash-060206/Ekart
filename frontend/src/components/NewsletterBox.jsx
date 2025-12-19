@@ -7,7 +7,7 @@ const NewsletterBox = () => {
     }
 
   return (
-     <div className='text-center'>
+     <div className='text-center border py-6'>
         <p className='text-2xl font-medium text-gray-800'>Subscribe now and get 20%</p>
         <p className="text-gray-400 mt-3">Subscribe now and get an instant 20% discount on your first order.</p>
         <form onSubmit={onSubmitHandler} className="w-full sm:w-1/2 flex items-center gap-3 mx-auto my-6 border pl-3">
