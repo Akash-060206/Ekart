@@ -4,6 +4,7 @@ import { assets } from "../assets/assets"
 import CartTotal from "../components/CartTotal"
 import Title from "../components/Title"
 import { ShopContext } from "../context/ShopContext"
+import { toast } from "react-toastify"
 
 const PlaceOrder = () => {
 
