@@ -9,7 +9,7 @@ import List from './pages/List'
 import Orders from './pages/Orders'
 
 export const backendUrl =import.meta.env.VITE_BACKEND_URL
-export const currency = "$"
+export const currency = "₹"
 
 
 const App = () => {
