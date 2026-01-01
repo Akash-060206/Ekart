@@ -1,7 +1,9 @@
+import crypto from "crypto";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import validator from 'validator';
 import userModel from "../models/userModel.js";
+import sendEmail from "../utils/sendEmail.js";
 
 
 const createToken = (id) => {
@@ -11,23 +13,25 @@ const createToken = (id) => {
 
 //Route for user login
 const loginUser = async (req, res) => {
-     try {
+    try {
         const { email, password } = req.body;
         const user = await userModel.findOne({ email })
+
         if (!user) {
             return res.json({ success: false, message: "User does not exists" })
         }
 
+        if (!user.isVerified) {
+            return res.json({ success: false, message: "Please verify your email first" });
+        }
+
         const isMatch = await bcrypt.compare(password, user.password);
-        if (isMatch) {
-
-            const token = createToken(user._id)
-            res.json({ success: true, token })
-
+        if (!isMatch) {
+            return res.json({ success: false, message: "Invalid credentials" });
         }
-        else {
-            res.json({ success: false, message: 'Invalid credentials' })
-        }
+
+        const token = createToken(user._id);
+        return res.json({ success: true, token });
 
     } catch (error) {
         console.log(error);
@@ -62,18 +66,33 @@ const registerUser = async (req, res) => {
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password, salt)
 
+        // generate verification token
+        const verificationToken = crypto.randomBytes(32).toString("hex");
+
         // Registering the user in the database with hashed password
         const newUser = new userModel({
             name,
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            isVerified: false,
+            emailVerificationToken: verificationToken,
+            emailVerificationExpires: Date.now() + 24 * 60 * 60 * 1000
         })
         const user = await newUser.save()
 
+        // send verification email
+        const verifyLink = `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`;
 
-        const token = createToken(user._id)
-        res.json({ success: true, token })
+        await sendEmail({
+            to: email,
+            subject: "Verify your email",
+            text: `Click this link to verify your email: ${verifyLink}`
+        });
 
+        res.json({
+            success: true,
+            message: "Verification email sent. Please check your inbox."
+        });
 
     } catch (error) {
         console.log(error)
@@ -81,11 +100,38 @@ const registerUser = async (req, res) => {
     }
 }
 
+const verifyEmail = async (req, res) => {
+    try {
+        const { token } = req.params;
+
+        const user = await userModel.findOne({
+            emailVerificationToken: token,
+            emailVerificationExpires: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            return res.json({ success: false, message: "Invalid or expired link" });
+        }
+
+        user.isVerified = true;
+        user.emailVerificationToken = null;
+        user.emailVerificationExpires = null;
+
+        await user.save();
+
+        res.json({ success: true, message: "Email verified successfully" });
+
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+};
+
+
 
 //Route for admin login
 
 const adminLogin = async (req, res) => {
-   try {
+    try {
         const { email, password } = req.body
         if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
             const token = jwt.sign(email + password, process.env.JWT_SECRET);
@@ -100,4 +146,4 @@ const adminLogin = async (req, res) => {
 }
 
 
-export { adminLogin, loginUser, registerUser };
+export { adminLogin, loginUser, registerUser, verifyEmail };

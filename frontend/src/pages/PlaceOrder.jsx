@@ -96,7 +96,7 @@ const PlaceOrder = () => {
                   razorpay_payment_id: response.razorpay_payment_id,
                   razorpay_signature: response.razorpay_signature,
                   orderId
-                }
+                },{ headers: { token } }
               )
 
               if (verifyResponse.data.success) {
@@ -179,7 +179,7 @@ const PlaceOrder = () => {
             </div>
           </div>
           <div className="w-full text-end mt-8">
-            <button onClick={() => navigate('/orders')} type="submit" className="bg-black text-white px-16 py-3 text-sm cursor-pointer">PLACER ORDER</button>
+            <button onClick={() => navigate('/orders')} type="submit" className="bg-black text-white px-16 py-3 text-sm cursor-pointer">PLACE ORDER</button>
           </div>
         </div>
       </div>
