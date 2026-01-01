@@ -13,6 +13,7 @@ import Product from './pages/Product'
 import Footer from './components/Footer'
 import SearchBar from './components/SearchBar'
 import VerifyEmail from './pages/VerifyEmail'
+import ForgotPassword from './pages/ForgotPassword'
 import { ToastContainer } from 'react-toastify'
 
 const App = () => {
@@ -32,6 +33,7 @@ const App = () => {
         <Route path='/place-order' element={<PlaceOrder/>}/>
         <Route path='/orders' element={<Orders/>}/>
         <Route path="/verify-email/:token" element={<VerifyEmail />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
       </Routes>
       <Footer/>
       

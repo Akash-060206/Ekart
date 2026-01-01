@@ -5,9 +5,11 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     cartData: { type: Object, default: {} },
-    isVerified: {  type: Boolean, default: false  },
-    emailVerificationToken: { type: String,},
-    emailVerificationExpires: { type: Date}
+    isVerified: { type: Boolean, default: false },
+    emailVerificationToken: { type: String, },
+    emailVerificationExpires: { type: Date },
+    resetOtp: { type: String, },
+    resetOtpExpire: { type: Date },
 }, { minimize: false })
 
 const userModel = mongoose.models.user || mongoose.model('user', userSchema);
